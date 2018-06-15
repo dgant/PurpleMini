@@ -1,4 +1,4 @@
 #include <BWAPI.h>
-#define VV void
 #define UN using namespace
-UN BWAPI;UN Filter;UN std;using ss=string;using u=Unit;using b=bool;using ui=unsigned;using i=int;auto &g=BroodwarPtr;struct ExampleAIModule:AIModule{VV onStart(){}VV onEnd(b w){}VV onFrame(){g->drawTextScreen(0,0,"Frame:%d",g->getFrameCount());}VV onSendText(ss t){}VV onReceiveText(Player p, Player t){}VV onPlayerLeft(Player p){}VV onNukeDetect(Position t){}VV onUnitDiscover(u u){}VV onUnitEvade(u u){}VV onUnitShow(u u){}VV onUnitHide(u u){}VV onUnitCreate(u u){}VV onUnitDestroy(u u){}VV onUnitMorph(u u){}VV onUnitRenegade(ui u){}VV onSaveGame(ss){}VV onUnitComplete(u u){}};
+UN BWAPI;UN Filter;UN std;using ss=string;using U=Unit;using b=bool;using i=int;using V=void;auto&g=BroodwarPtr;
+struct ExampleAIModule:AIModule{V onStart(){}V onFrame(){auto s=g->self();g->drawTextScreen(0,0,"Frame:%d",g->getFrameCount());}V onUnitShow(U u){}V onUnitHide(U u){}V onUnitCreate(U u){}V onUnitDestroy(U u){}V onUnitMorph(U u){}V onUnitRenegade(U u){}V onUnitComplete(U u){}};
