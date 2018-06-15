@@ -1,29 +1,4 @@
-#pragma once
 #include <BWAPI.h>
-
-// Remember not to use "Broodwar" in any global class constructor!
-
-class ExampleAIModule : public BWAPI::AIModule
-{
-public:
-  // Virtual functions for callbacks, leave these as they are.
-  virtual void onStart();
-  virtual void onEnd(bool isWinner);
-  virtual void onFrame();
-  virtual void onSendText(std::string text);
-  virtual void onReceiveText(BWAPI::Player player, std::string text);
-  virtual void onPlayerLeft(BWAPI::Player player);
-  virtual void onNukeDetect(BWAPI::Position target);
-  virtual void onUnitDiscover(BWAPI::Unit unit);
-  virtual void onUnitEvade(BWAPI::Unit unit);
-  virtual void onUnitShow(BWAPI::Unit unit);
-  virtual void onUnitHide(BWAPI::Unit unit);
-  virtual void onUnitCreate(BWAPI::Unit unit);
-  virtual void onUnitDestroy(BWAPI::Unit unit);
-  virtual void onUnitMorph(BWAPI::Unit unit);
-  virtual void onUnitRenegade(BWAPI::Unit unit);
-  virtual void onSaveGame(std::string gameName);
-  virtual void onUnitComplete(BWAPI::Unit unit);
-  // Everything below this line is safe to modify.
-
-};
+#define VV void
+#define UN using namespace
+UN BWAPI;UN Filter;UN std;using ss=string;using u=Unit;using b=bool;using ui=unsigned;using i=int;auto &g=BroodwarPtr;struct A:AIModule{VV onStart(){}VV onEnd(b w){}VV onFrame(){g->drawTextScreen(0,0,"Frame:%d",g->getFrameCount());}VV onSendText(ss t){}VV onReceiveText(Player p, Player t){}VV onPlayerLeft(Player p){}VV onNukeDetect(Position t){}VV onUnitDiscover(u u){}VV onUnitEvade(u u){}VV onUnitShow(u u){}VV onUnitHide(u u){}VV onUnitCreate(u u){}VV onUnitDestroy(u u){}VV onUnitMorph(u u){}VV onUnitRenegade(ui u){}VV onSaveGame(ss){}VV onUnitComplete(u u){}};using ExampleAIModule=A;
