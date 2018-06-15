@@ -91,7 +91,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Dll.cpp" />
-    <ClCompile Include="Source\ExampleAIModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ExampleAIModule.h" />
