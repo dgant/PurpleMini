@@ -14,7 +14,7 @@ V onFrame(){
   for(U u:g->getAllUnits()) {
     int f=u->getPlayer()==s;
     A t=u->getType();
-    (m=m&&m->exists()?m:t.isMineralField()?u:0)&&f&&!u->isGatheringMinerals()&&u->gather(m);
+    (m=m&&m->exists()?m:t.isMineralField()?u:0)&&f&&u->isGatheringMinerals()||u->gather(m);
   }
 }
 };
