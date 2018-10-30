@@ -8,15 +8,13 @@ G U=UnitInterface*;
 G V=void;
 A&g=BroodwarPtr;
 U m=0;
-class ExampleAIModule:AIModule{
+struct ExampleAIModule:AIModule{
 V onFrame(){
   A*s=g->self();
-  m=m&&m->exists()?m:0;
   for(U u:g->getAllUnits()) {
     int f=u->getPlayer()==s;
     A t=u->getType();
-    m=m?m:t.isMineralField()?u:0;
-    m&&f&&!u->isGatheringMinerals()&&u->gather(m);
+    (m=m&&m->exists()?m:t.isMineralField()?u:0)&&f&&!u->isGatheringMinerals()&&u->gather(m);
   }
 }
 };
