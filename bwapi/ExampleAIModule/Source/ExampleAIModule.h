@@ -13,35 +13,35 @@ N std;
 G U=UnitInterface*;
 G V=void;
 A&g=BroodwarPtr;
-U m;
+U m,b;
 PP d;
 TP bd;
-int i,t,cW,cF,cB,cT,cE,lW,lF,lB,lT,lE;
+int i,t,cW,cF,cP,cB,cT,cE,lW,lF,lP,lB,lT,lE;
 struct ExampleAIModule:AIModule{
 V onFrame(){
   g->setLocalSpeed(lF<12?0:1);
-  g->drawTextScreen(0, 0, "%dW %dF %dB %dT %dE", lW, lF, lB, lT, lE);
+  g->drawTextScreen(0,0,"%dW %dF %dP %dB %dT %dE",lW,lF,lP,lB,lT,lE);
   if(++i%6>0)return;
   g->setLatCom(cW=cF=cB=cT=cE=0);
   A*s=g->self();
   A ou=s->getUnits();
   A sl=s->getStartLocation();
-  A ms=20+s->minerals(),su=s->supplyTotal()-s->supplyUsed(),sc=0+g->isVisible(TP(d));
+  A ms=20+s->minerals(),su=0,sc=0+g->isVisible(TP(d));
+  for(A u:ou){A t=u->getType();su+=t.supplyProvided()-t.supplyRequired();};
   A&st=g->getStartLocations();
   d=sc&&!lE?PP(st[++t%st.size()]):d;  
   bd=bd==TP()?sl:bd;
+  b=b&&b->exists()?b:g->getClosestUnit(PP(bd),IsOwned&&IsWorker);
   A B=[&](UnitType x){
-    if((ms-=x.mineralPrice())>0){
+    A r=(ms-=x.mineralPrice())>0;
+    if(r){
       su+=x.supplyProvided();      
-      A c=find_if(ou.begin(),ou.end(),[&](A z){return bd==TP(z->getOrderTargetPosition());});
-      U u=(c!=ou.end()?*c:g->getClosestUnit(PP(bd),IsWorker&&IsOwned));
-      if(u){
+      if(b){
         bd=g->getBuildLocation(x,TP(sl),100);
-        g->isVisible(bd)?u->build(x,bd):u->move(PP(bd));
-        return 1;
+        g->isVisible(bd)?b->build(x,bd):b->move(PP(bd));
       }
     }
-    return 0;
+    return r;
   };
   A T=[&](UnitType x, UnitType y) {
     A p=x.mineralPrice();
@@ -57,11 +57,10 @@ V onFrame(){
     return 0;
   };
   while(ms>0){
-    if(lW<22*lT&&(lB>1||lW<8)&&T(Terran_SCV,Terran_Command_Center))C
-    if(lW>20*lT&&B(Terran_Command_Center))C
-    if(su<3+3*lB&&lB>1&&B(Terran_Supply_Depot))C
-    if(T(Terran_Marine,Terran_Barracks))C    
-    if(lB<lT*4&&B(Terran_Barracks))C
+    if(((lP<1&&lW>7)||su<2+4*lB)&&B(Protoss_Pylon))C
+    if(T(Protoss_Zealot,Protoss_Gateway))C
+    if(lW<22&&T(Protoss_Probe,Protoss_Nexus))C
+    if(lB<lT*5&&B(Protoss_Gateway))C
     break;
   }
   for(U u:g->getAllUnits()) {
@@ -71,7 +70,8 @@ V onFrame(){
     e=u->exists(),
     v=u->isVisible(),
     iW=t.isWorker(),
-    iB=t==Terran_Barracks,
+    iP=t==Protoss_Pylon,
+    iB=t==Protoss_Gateway,
     iT=t.isResourceDepot(),
     iE=p->isEnemy(s),
     ag=!!t.maxGroundHits(),
@@ -82,14 +82,13 @@ V onFrame(){
     if(p==s){
       iW?++cW:cF+=ag;
       cT+=iT;
+      cP+=iP;
       cB+=iB;
-      if(ag)if(U v=u->getClosestUnit(IsEnemy&&CanAttack,iW?99:1e3)){
-        u->isAttacking()||u->attack(UP(v));C
-        //iW||u->getGroundWeaponCooldown()<6?u->isAttacking()||u->attack(v):u->move(UP(u)-UP(v));C
-      }
+      U v=(v=u->getClosestUnit(IsEnemy&&CanAttack,iW?99:1e3))?v:u->getClosestUnit(IsEnemy,iW?0:1e3);
+      if(ag&&v){u->isAttacking()||u->attack(UP(v));C}
       iW?u->isIdle()&&u->gather(m):ag?u->attack(d):0;
     }
   }
-  lW=cW;lF=cF;lB=cB;lT=cT;lE=cE;
+  lW=cW;lF=cF;lP=cP;lB=cB;lT=cT;lE=cE;
 }
 };
