@@ -27,7 +27,7 @@ g->setLocalSpeed(lE>0);
 A*s=g->self();
 A ou=s->getUnits();
 A sl=s->getStartLocation();
-I k[99999]={},f[99999]={1},ms=45+s->minerals(),su=0,sc=0+g->isVisible(TP(d));
+I k[99999]={},ms=45+s->minerals(),su=0,sc=0+g->isVisible(TP(d));
 for(A u:ou)su+=GT(u).supplyProvided()-GT(u).supplyRequired();
 A&st=g->getStartLocations();
 d=(sc&&!lE||d==PP())?PP(st[(++t)%st.size()])+(i<1e5?PP():PP(i%994-497,(i*su)%994-497)):d;
@@ -72,24 +72,21 @@ A p=u->getPlayer();
 A t=GT(u);
 A up=UP(u);
 I ag=!!t.maxGroundHits(),
-e=u->exists(),
-iW=t.isWorker(),
-iE=p->isEnemy(s);
-I iF=ag&&(!iW||(u==c&&lB>1)),cs=u->getHitPoints()/t.maxHitPoints()*(iW?20.:100.)*(f[I(u)]?1.:.7);
-m=m&&m->exists()?m:t.isMineralField()&&u->exists()?u:m;
-iE&&e?++cE:0;
-d=iE&&!sc&&e&&t.isBuilding()?up:d;
+iW=t.isWorker();
+I iF=ag&&(!iW||(u==c&&lB>1)),cs=(iW?20.:100.)*u->getHitPoints()/(1.+t.maxHitPoints());
+m=m&&m->exists()?m:t.isMineralField()?u:m;
+cE+=p->isEnemy(s);
 if(p==s){
   cW+=iW;cP+=t==Z(Pylon);cB+=t==Z(Gateway);
   if(!R(u))C
-  if(iF)for(U n:u->getUnitsInRadius(480,CanAttack)){
+  if(iF)for(U n:u->getUnitsInRadius(512,CanAttack)){
     A q=GT(n);
-    cs+=(n->getPlayer()==s?1:-1)
+    cs+=(n->getPlayer()==s?1.:-1)
     *u->isCompleted()
-    *(q.gasPrice()+MP(q)+(q==Zerg_Sunken_Colony?100:0))/(1+q.isTwoUnitsInOneEgg())/(1+5*q.isWorker())
-    *n->getHitPoints()/(1+q.maxHitPoints());
+    *(u->getDistance(n)-GT(n).groundWeapon().maxRange()<320)
+    *(q.gasPrice()+MP(q)+(q==Zerg_Sunken_Colony?100:0))/(1+q.isTwoUnitsInOneEgg())/(1+5*q.isWorker())    
+    *n->getHitPoints()/(1.+q.maxHitPoints());
   }
-  f[I(u)]=cs>=0;
   if(cs<0&&up.getDistance(PP(sl))>224&&u->move(PP(sl)))C    
 #define TR u->getClosestUnit(IsEnemy&&!IsCloaked&&!IsFlying
   U v=(v=TR&&CanAttack,iF?1e3:99))?v:TR,iW?0:1e3);
