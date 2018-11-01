@@ -67,6 +67,7 @@ V onFrame(){
     A p=u->getPlayer();
     A t=u->getType();
     int
+    cs=100,
     e=u->exists(),
     v=u->isVisible(),
     iW=t.isWorker(),
@@ -76,6 +77,7 @@ V onFrame(){
     iE=p->isEnemy(s),
     ag=!!t.maxGroundHits(),
     aa=!!t.maxAirHits();
+    A iF=ag&&!iW;
     m=m&&e?m:t.isMineralField()?u:0;
     cE+=iE*e;
     d=iE&&!sc&&v?UP(u):d;
@@ -84,7 +86,12 @@ V onFrame(){
       cT+=iT;
       cP+=iP;
       cB+=iB;
-      U v=(v=u->getClosestUnit(IsEnemy&&CanAttack,iW?99:1e3))?v:u->getClosestUnit(IsEnemy,iW?0:1e3);
+      if(iF)for(U n:u->getUnitsInRadius(300,CanAttack)){
+        A nt=n->getType();
+        cs+=(n->getPlayer()==s?1:-1)*nt.mineralPrice()/(1+nt.isTwoUnitsInOneEgg())/(1+5*nt.isWorker());
+      }
+      if(cs<0&&UP(u).getDistance(PP(sl))>300&&u->move(PP(sl)))C
+      U v=(v=u->getClosestUnit(IsEnemy&&CanAttack&&!IsCloaked,iW?99:1e3))?v:u->getClosestUnit(IsEnemy,iW?0:1e3);
       if(ag&&v){u->isAttacking()||u->attack(UP(v));C}
       iW?u->isIdle()&&u->gather(m):ag?u->attack(d):0;
     }
