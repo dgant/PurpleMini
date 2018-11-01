@@ -14,16 +14,15 @@ N Filter;
 N std;
 G I=int;G U=UnitInterface*;
 A&g=BroodwarPtr;
-U m,b;
+U m,b,c;
 PP d;
 TP bd;
-I i,t,cW,cF,cP,cB,cE,lW,lF,lP,lB,lE;
+I i,t,cW,cP,cB,cE,lW,lP,lB,lE;
 struct ExampleAIModule:AIModule{
 void onFrame(){
-  g->setLatCom(cW=cF=cB=cE=0);
-  g->drawTextScreen(0,0,"%dW %dF %dP %dB %dT %dE",lW,lF,lP,lB,lE);
+  g->setLatCom(cW=cP=cB=cE=0);
   if(++i%6>0)return;  
-  g->setLocalSpeed(lW<8?0:1);
+  g->setLocalSpeed(lB>1);
   I k[99999]={};  
   A*s=g->self();
   A ou=s->getUnits();
@@ -31,9 +30,11 @@ void onFrame(){
   A ms=45+s->minerals(),su=0,sc=0+g->isVisible(TP(d));
   for(A u:ou){A t=u->getType();su+=t.supplyProvided()-t.supplyRequired();};
   A&st=g->getStartLocations();
-  d=sc&&!lE?PP(st[++t%st.size()]):d;  
+  d=sc&&!lE?PP(st[++t%st.size()])+(i<1e5?PP():PP(i%994-497,(i*su)%994-497)):d;
+  g->drawCircleMap(d,99,Colors::Red);
   bd=bd==TP()?sl:bd;
   b=b&&b->exists()?b:g->getClosestUnit(PP(bd),IsOwned&&IsWorker);
+  c=c?c:b->getClosestUnit(IsWorker);
   A B=[&](UnitType x){
     A r=(ms-=x.mineralPrice())>0;
     if(r){
@@ -72,30 +73,30 @@ void onFrame(){
     A p=u->getPlayer();
     A t=u->getType();
     I cs=100,
+    ag=!!t.maxGroundHits(),
     e=u->exists(),
     v=u->isVisible(),
     iW=t.isWorker(),
     iP=t==Protoss_Pylon,
     iB=t==Protoss_Gateway,
-    iE=p->isEnemy(s),
-    ag=!!t.maxGroundHits(),
-    aa=!!t.maxAirHits();
-    A iF=ag&&!iW;
-    m=m&&e?m:t.isMineralField()?u:0;
-    cE+=iE*e;
+    iE=p->isEnemy(s);
+    I iF=ag&&(!iW||(u==c&&lB>1));
+    m=m&&m->exists()?m:t.isMineralField()&&u->exists()?u:m;
+    iE&&e?++cE:0;
     d=iE&&!sc&&v&&!u->isCloaked()&&!u->isFlying()?UP(u):d;
     if(p==s){
-      iW?++cW:cF+=ag;
+      cW+=iW;
       cP+=iP;
       cB+=iB;
       if(!R(u))C
-      if(iF)for(U n:u->getUnitsInRadius(300,CanAttack)){A nt=n->getType();cs+=(n->getPlayer()==s?1:-1)*nt.mineralPrice()/(1+nt.isTwoUnitsInOneEgg())/(1+5*nt.isWorker());}
+      if(iF)for(U n:u->getUnitsInRadius(300,CanAttack)){A nt=n->getType();cs+=(n->getPlayer()==s?1:-1)*(nt.gasPrice()+nt.mineralPrice())/(1+nt.isTwoUnitsInOneEgg())/(1+5*nt.isWorker());}
       if(cs<0&&UP(u).getDistance(PP(sl))>300&&u->move(PP(sl)))C
-      U v=(v=u->getClosestUnit(IsEnemy&&CanAttack&&!IsCloaked,iW?99:1e3))?v:u->getClosestUnit(IsEnemy,iW?0:1e3);
+#define TR u->getClosestUnit(IsEnemy&&!IsCloaked&&!IsFlying
+      U v=(v=TR&&CanAttack,iW?99:1e3))?v:TR,iW?0:1e3);
       if(ag&&v){u->isAttacking()||u->attack(UP(v));C}
-      iW?u->isIdle()&&u->gather(m):ag?u->attack(d):0;
+      iF?u->attack(d):u->isGatheringMinerals()||u->gather(m);
     }
   }
-  lW=cW;lF=cF;lP=cP;lB=cB;lE=cE;
+  lW=cW;lP=cP;lB=cB;lE=cE;
 }
 };
